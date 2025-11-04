@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pick your ORMCO Blind Box</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: #fff8f0;
+        }
+        h1 {
+            font-size: 24px;
+            color: #ff6f61;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 500px; /* widened */
+            margin: 20px auto;
+        }
+        .box {
+            background: #ffe0b2;
+            border-radius: 10px;
+            padding: 40px 10px; /* more vertical space */
+            font-size: 20px;
+            cursor: pointer;
+            border: 2px solid #ffb74d;
+            transition: all 0.3s ease;
+            min-height: 120px; /* added to give consistent height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .box:active {
+            transform: scale(0.95);
+        }
+        .opened {
+            background: #fff3e0;
+            border-color: #ffa726;
+            cursor: default;
+            font-size: 16px; /* slightly smaller to fit text */
+            padding: 20px 10px 25px; /* more room for text */
+            line-height: 1.4;
+        }
+        .disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        small {
+            display: block;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+        canvas {
+            position: fixed;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎁 Pick your ORMCO Blind Box!</h1>
+    <p>Tap one box to reveal your surprise!</p>
+    <div class="grid">
+        <div class="box" onclick="openBox(this)">1</div>
+        <div class="box" onclick="openBox(this)">2</div>
+        <div class="box" onclick="openBox(this)">3</div>
+        <div class="box" onclick="openBox(this)">4</div>
+        <div class="box" onclick="openBox(this)">5</div>
+        <div class="box" onclick="openBox(this)">6</div>
+    </div>
+
+    <!-- Dental-themed playful sound -->
+    <audio id="dentalSound" src="https://freesound.org/data/previews/492/492174_10201614-lq.mp3"></audio>
+
+    <!-- Confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        let prizesPool = [
+            "DAMON Q2 (Neutral) Full Set U/L7-7",
+            "Damon Ultima 7-7 U2-2 Retro, Snaplink, ti-tube",
+            "Damon Ultima 7-7 U3-3 Pro, L2-2 Retro, Snaplink, ti-tube",
+            "Symetri Clear MBT U5-5 hk on 3 .022",
+            "Damon Typodont/Damon 15x Model",
+            "DAMON Q2 (Neutral) Full Set U/L7-7"
+        ];
+
+        const boxTitles = ["🔥 ULTRA PICK!", "✨ RARE FIND!", "🎉 SPECIAL REWARD!", "🌟 LUCKY STRIKE!", "💎 GOLDEN PICK!", "🎁 PREMIUM BONUS!"];
+        let hasOpened = false;
+
+        function openBox(box) {
+            if (hasOpened) return;
+            if (box.classList.contains("opened")) return;
+
+            const randomIndex = Math.floor(Math.random() * prizesPool.length);
+            const prize = prizesPool[randomIndex];
+            const title = boxTitles[randomIndex % boxTitles.length];
+
+            const sound = document.getElementById("dentalSound");
+            sound.currentTime = 0;
+            sound.play();
+
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            box.innerHTML = `${title}<br>🎁 ${prize}<br><small>Show this to claim!</small>`;
+            box.classList.add("opened");
+            prizesPool.splice(randomIndex, 1);
+            hasOpened = true;
+
+            // disable all boxes after one pick
+            const boxes = document.querySelectorAll('.box');
+            boxes.forEach(b => {
+                if (!b.classList.contains('opened')) {
+                    b.classList.add('disabled');
+                }
+            });
+        }
+
+        function resetBoxes() {
+            const boxes = document.querySelectorAll('.box');
+            boxes.forEach((box, i) => {
+                box.innerHTML = i + 1;
+                box.classList.remove('opened', 'disabled');
+            });
+            prizesPool = [
+                "DAMON Q2 (Neutral) Full Set U/L7-7",
+                "Damon Ultima 7-7 U2-2 Retro, Snaplink, ti-tube",
+                "Damon Ultima 7-7 U3-3 Pro, L2-2 Retro, Snaplink, ti-tube",
+                "Symetri Clear MBT U5-5 hk on 3 .022",
+                "Damon Typodont/Damon 15x Model",
+                "DAMON Q2 (Neutral) Full Set U/L7-7"
+            ];
+            hasOpened = false;
+        }
+    </script>
+</body>
+</html>
